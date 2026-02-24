@@ -4,56 +4,62 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>財務諸表分析指標 RPG - Final Edition</title>
-  <style>
-    :root{
-      --border:#ddd; --border2:#ccc; --text-muted:#666;
-      --ok:#0a7; --ng:#c33; --radius:14px;
-      --asset-bg: #eef6ff; --asset-bd:#b7d7ff;
-      --exp-bg:   #fff7e6; --exp-bd:#ffd08a;
-      --other-bg: #f5f5f5; --other-bd:#d9d9d9;
-    }
+<style>
+  /* --- スマホ最適化のポイント --- */
 
-    body { font-family: sans-serif; max-width: 920px; margin: 24px auto; padding: 0 12px; background-color: #f9f9f9; color: #333; }
-    .card { border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; }
-    .muted { color: var(--text-muted); font-size: 14px; }
-    .big { font-size: 28px; font-weight: 800; margin: 10px 0 20px; color: #000; text-align: center; line-height: 1.2; }
-    
-    .status-bar { 
-      display: flex; align-items: center; gap: 16px; 
-      margin-bottom: 20px; padding: 16px; border-radius: 12px;
-      border: 2px solid #333;
-      background: linear-gradient(270deg, #ffe6e6, #e6f0ff, #e6ffe6, #fffde6);
-      background-size: 800% 800%;
-      animation: bgAnimation 15s ease infinite;
-    }
-    @keyframes bgAnimation { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-    .char-icon { font-size: 48px; line-height: 1; animation: bounce 2s infinite; }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  /* 1. ボタンのグリッド設定を「4列固定」または「自動調整」に変更 */
+  .grid { 
+    display: grid; 
+    gap: 6px; /* 隙間を狭く */
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); /* 1つあたりの幅を小さく */
+    margin-top: 15px; 
+  }
 
-    .formula-display {
-      min-height: 60px; background: #f8f9fa; border: 2px inset #eee; border-radius: 10px;
-      padding: 10px; display: flex; gap: 4px; flex-wrap: wrap; align-items: center; justify-content: center; margin-bottom: 10px;
-    }
-    .token { background: #fff; border: 1px solid #999; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  /* 2. ボタン自体の余白を削り、文字を小さくする */
+  .typeBtn { 
+    padding: 8px 2px; /* 上下左右の余白を最小限に */
+    font-size: 11px;  /* 文字を少し小さくして1行に収まりやすく */
+    font-weight: 800; 
+    border-radius: 8px; 
+    border: 1px solid var(--border2); 
+    line-height: 1.1;
+    min-height: 40px; /* 押しやすさは確保 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); margin-top: 20px; }
-    .typeBtn { padding: 12px 4px; font-size: 13px; font-weight: 800; border-radius: 10px; border: 2px solid var(--border2); cursor: pointer; background: #fff; transition: 0.1s; line-height: 1.2; }
-    .typeBtn:active { transform: translateY(2px); filter: brightness(0.9); }
-    
-    .btn-bs { background-color: var(--asset-bg) !important; border-color: var(--asset-bd) !important; color: #004488; }
-    .btn-pl { background-color: var(--exp-bg) !important; border-color: var(--exp-bd) !important; color: #884400; }
-    .btn-op { background-color: var(--other-bg) !important; border-color: var(--other-bd) !important; }
+  /* 3. 上部のステータスバーや文字サイズを少しコンパクトに */
+  .big { 
+    font-size: 20px; /* 指標名を少し小さく */
+    margin: 5px 0 10px; 
+  }
+  .status-bar { 
+    padding: 10px; 
+    gap: 10px; 
+    margin-bottom: 15px;
+  }
+  .char-icon { font-size: 32px; }
 
-    .actionBtn { padding: 10px 16px; font-weight: 700; border-radius: 10px; border: 1px solid var(--border2); background: #fff; cursor: pointer; }
-    .submitBtn { padding: 12px 24px; font-size: 18px; font-weight: 900; border-radius: 10px; border: 2px solid #333; background: #333; color: #fff; cursor: pointer; flex: 1; }
-    .submitBtn:hover { background: #000; }
+  /* 4. 回答エリア（式が表示される場所）の高さ */
+  .formula-display {
+    min-height: 50px;
+    padding: 5px;
+  }
+  .token {
+    padding: 2px 5px;
+    font-size: 12px;
+  }
 
-    #result { text-align: center; font-size: 18px; font-weight: bold; min-height: 1.5em; margin-bottom: 5px; }
+  /* 5. 画面全体の余白を削る */
+  body { margin: 10px auto; }
+  .card { padding: 12px; }
 
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-card { background: #fff; padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 500px; }
-    .mistake-item { text-align: left; padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-  </style>
+  /* 6. 回答・消去ボタンのサイズ調整 */
+  .submitBtn { padding: 10px; font-size: 16px; }
+  .actionBtn { padding: 8px 10px; font-size: 12px; }
+</style>
+
 </head>
 <body>
 
